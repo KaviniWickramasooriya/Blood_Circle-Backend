@@ -2,9 +2,10 @@
   "name": "user-service",
   "version": "1.0.0",
   "description": "User Service for Blood Circle Backend",
-  "main": "src/index.js",
+  "main": "index.js",
   "scripts": {
-    "start": "nodemon src/index.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
