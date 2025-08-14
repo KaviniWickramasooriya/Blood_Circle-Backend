@@ -8,6 +8,7 @@ const adminRoutes = require("./src/routes/adminRoutes");
 const donorRoutes = require("./src/routes/donorRoutes");
 const eventOrganisorRoutes = require("./src/routes/eventOrganisorRoutes");
 const genderRoutes = require("./src/routes/genderRoutes");
+const authRoutes = require("./src/routes/authRoutes.js");
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use("/api/users/eventOrganisor", eventOrganisorRoutes);
 app.use("/api/users/gender", genderRoutes);
 app.use("/api/users/roles", roleRoutes);
 app.use("/api/users/admin", adminRoutes);
+app.use("/api/users/auth", authRoutes);
 
 // 404 Error Handler
 app.use((req, res) => {
