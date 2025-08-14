@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const bcrypt = require('bcrypt');
 
-// Admin model definition
+// Admin model
 module.exports = (sequelize) => {
   const Admin = sequelize.define('Admin', {
     id: {
