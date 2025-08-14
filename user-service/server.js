@@ -18,10 +18,17 @@ app.use(cors());
 
 // Verify Database Connection
 sequelize.authenticate()
-  .then(() => console.log('Database connected'))
+  .then(() => {
+    console.log('Database connected');
+    // Sync models with the database
+    return sequelize.sync({ force: false }); // Set to true only for development to drop and recreate tables
+  })
+  .then(() => {
+    console.log('Database synced successfully');
+  })
   .catch(err => {
-    console.error('Database connection error:', err);
-    process.exit(1); // Exit if connection fails
+    console.error('Database connection or sync error:', err);
+    process.exit(1); // Exit if connection or sync fails
   });
 
 // Routes
@@ -39,5 +46,5 @@ app.use((req, res) => {
 });
 
 // Start Server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`${process.env.SERVICE_NAME} Service running on port ${PORT}`));
