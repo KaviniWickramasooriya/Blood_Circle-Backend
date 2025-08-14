@@ -28,7 +28,7 @@ app.use("/api/users/donor", donorRoutes);
 app.use("/api/users/eventOrganisor", eventOrganisorRoutes);
 app.use("/api/users/gender", genderRoutes);
 app.use("/api/users/roles", roleRoutes);
-app.use("/api/users/admins", adminRoutes);
+app.use("/api/users/admin", adminRoutes);
 
 // 404 Error Handler
 app.use((req, res) => {
