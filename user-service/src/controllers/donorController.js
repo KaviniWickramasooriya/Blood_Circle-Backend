@@ -12,12 +12,11 @@ exports.registerDonor = async (req, res) => {
       nic,
       address,
       genderId,
-      roleId,
       telephoneNo
     } = req.body;
 
-    // Input validation
-    if (!name || !email || !password || !bloodType || !dateOfBirth || !nic || !address || !genderId || !roleId || !telephoneNo) {
+    // Input validation (removed roleId from required fields)
+    if (!name || !email || !password || !bloodType || !dateOfBirth || !nic || !address || !genderId || !telephoneNo) {
       return res.status(400).json({
         error: 'Missing required fields',
         details: {
@@ -29,7 +28,6 @@ exports.registerDonor = async (req, res) => {
           nic: nic ? undefined : 'NIC is required',
           address: address ? undefined : 'Address is required',
           genderId: genderId ? undefined : 'Gender ID is required',
-          roleId: roleId ? undefined : 'Role ID is required',
           telephoneNo: telephoneNo ? undefined : 'Telephone number is required'
         }
       });
@@ -59,16 +57,17 @@ exports.registerDonor = async (req, res) => {
       });
     }
 
-    // Check if role exists
-    const role = await Role.findByPk(roleId);
-    if (!role) {
+    // Fetch the roleId for "Donor" from the Roles table
+    const donorRole = await Role.findOne({ where: { name: 'Donor' } });
+    if (!donorRole) {
       return res.status(400).json({
-        error: 'Invalid role ID',
-        details: 'The specified role does not exist'
+        error: 'Role "Donor" not found',
+        details: 'Please ensure the "Donor" role exists in the Roles table'
       });
     }
+    const roleId = donorRole.id;
 
-    // Create donor
+    // Create donor with the automatically assigned roleId
     const donor = await Donor.create({
       name,
       email,
@@ -92,7 +91,7 @@ exports.registerDonor = async (req, res) => {
       nic: donor.nic,
       address: donor.address,
       genderId: donor.genderId,
-      roleId: donor.roleId,
+      roleId: donor.roleId, // Include the automatically assigned roleId
       telephoneNo: donor.telephoneNo,
       createdAt: donor.createdAt,
       updatedAt: donor.updatedAt
