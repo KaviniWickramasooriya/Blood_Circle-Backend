@@ -7,11 +7,12 @@ const sequelize = new Sequelize(
   process.env.DB_PASSWORD,
   {
     host: process.env.DB_HOST,
-    dialect: 'postgres'
+    dialect: 'mysql'
   }
 );
 
 // Import models
 const Blood = require('../models/Blood')(sequelize);
+const BloodRequest = require('../models/BloodRequest')(sequelize);
 
 module.exports = sequelize;

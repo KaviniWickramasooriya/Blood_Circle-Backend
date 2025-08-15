@@ -15,6 +15,18 @@ module.exports = (sequelize) => {
       type: DataTypes.INTEGER,
       allowNull: false
     }
+   }, {
+      tableName: 'blood',      // Explicit table name (avoids Sequelize auto-pluralizing)
+      timestamps: true,        // Adds createdAt & updatedAt fields automatically
+      underscored: true           // Uses snake_case column names in DB
+    
   });
+
+  Blood.associate = (models) => {
+    Blood.hasMany(models.BloodRequest, {  // one blood type → many requests
+      foreignKey: 'blood_id',
+      as: 'requests'
+    });
+  };
   return Blood;
 };
