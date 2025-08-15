@@ -6,32 +6,32 @@ module.exports = (sequelize) => {
       primaryKey: true,
       autoIncrement: true
     },
-    BloodType: {
+    bloodType: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
         isIn: [['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']] // Only valid blood types
       }
     },
-    Quantity: {
+    quantity: {
       type: DataTypes.INTEGER,
       allowNull: false,
       validate: {
         min: 0 // Quantity cannot be negative
       }
     },
-    Name:{
+    name:{
         type: DataTypes.STRING,
         allowNull: false
     },
-    ContactNumber: {
+    contactNumber: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
         is: /^\d{10}$/ // Validates as a 10-digit phone number
       }
     },
-    Email: {
+    email: {
       type: DataTypes.STRING,
       allowNull: false
     },

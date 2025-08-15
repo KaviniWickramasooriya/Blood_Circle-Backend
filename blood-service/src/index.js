@@ -4,7 +4,7 @@ const routes = require('./routes/index.js');
 const db = require('./config/db.js');
 
 const app = express();
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 3003;
 
 app.use(express.json());
 app.use('/api/blood', routes);
