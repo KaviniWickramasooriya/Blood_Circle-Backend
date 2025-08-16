@@ -1,6 +1,6 @@
-const express = require('express');
+/*const express = require('express');
 const router = express.Router();
-const { Blood } = require('../config/db').models;
+const { Blood, BloodRequest } = require('../config/db').models;
 
 router.post('/', async (req, res) => {
   try {
@@ -12,3 +12,4 @@ router.post('/', async (req, res) => {
 });
 
 module.exports = router;
+*/
