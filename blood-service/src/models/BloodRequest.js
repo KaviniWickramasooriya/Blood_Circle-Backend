@@ -48,7 +48,7 @@ module.exports = (sequelize) => {
     BloodRequest.associate = (models) => {
         BloodRequest.belongsTo(models.Blood, { // many requests → one blood type
             foreignKey: 'blood_id',
-            as: 'bloodType'
+            as: 'blood'
         });
     };
     return BloodRequest;

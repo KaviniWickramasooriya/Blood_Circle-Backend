@@ -1,5 +1,6 @@
 const express = require('express');
 const bloodRoutes = require('./routes/bloodRoutes');
+const bloodRequestRoutes = require('./routes/bloodRequestRoutes');
 const db = require('./config/db');
 
 const app = express();
@@ -7,6 +8,7 @@ const PORT = process.env.PORT || 3003;
 
 app.use(express.json());
 app.use('/api/blood', bloodRoutes);
+app.use('/api/blood-requests', bloodRequestRoutes);
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Something went wrong!' });
