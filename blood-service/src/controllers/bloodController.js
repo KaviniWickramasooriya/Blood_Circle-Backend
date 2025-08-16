@@ -1,6 +1,6 @@
 
 const { Blood } = require('../config/db').models;
-const bcrypt = require('bcrypt');
+//const bcrypt = require('bcrypt');
 
 exports.createBlood = async (req, res) => {
   try {

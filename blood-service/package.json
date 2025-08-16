@@ -2,9 +2,10 @@
   "name": "blood-service",
   "version": "1.0.0",
   "description": "Blood Service for Blood Circle Backend",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
