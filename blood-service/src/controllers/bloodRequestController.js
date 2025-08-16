@@ -6,30 +6,35 @@ exports.createBloodRequest = async (req, res) => {
     const bloodRequest = await BloodRequest.create(req.body);
     res.status(201).json(bloodRequest);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    next(error);  // passes error to middleware
   }
 };
 
 // Get all blood requests
 exports.getAllBloodRequests = async (req, res) => {
   try {
-    const requests = await BloodRequest.findAll();
+    const requests = await BloodRequest.findAll({
+      include: { association: 'blood' } // ✅ joins Blood table
+    });
     res.json(requests);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);  // passes error to middleware
   }
 };
 
 // Get single blood request by ID
 exports.getBloodRequestById = async (req, res) => {
   try {
-    const request = await BloodRequest.findByPk(req.params.id);
+    const request = await BloodRequest.findByPk(req.params.id, {
+      include: { association: 'blood' }
+    });
     if (!request) {
       return res.status(404).json({ message: 'Blood request not found' });
     }
     res.json(request);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);  // passes error to middleware
+   
   }
 };
 
@@ -44,7 +49,7 @@ exports.updateBloodRequest = async (req, res) => {
     await request.update(req.body);
     res.json(request);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);  // passes error to middleware
   }
 };
 
@@ -59,6 +64,19 @@ exports.deleteBloodRequest = async (req, res) => {
     await request.destroy();
     res.json({ message: 'Blood request deleted successfully' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);  // passes error to middleware
   }
 };
+
+/*const page = parseInt(req.query.page) || 1;
+const limit = parseInt(req.query.limit) || 10;
+const offset = (page - 1) * limit;
+
+const requests = await BloodRequest.findAndCountAll({ limit, offset });
+res.json({
+  data: requests.rows,
+  total: requests.count,
+  page,
+  totalPages: Math.ceil(requests.count / limit)
+});
+*/
