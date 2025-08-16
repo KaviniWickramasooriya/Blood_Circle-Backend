@@ -9,8 +9,8 @@ const bloodRequestRoutes = require('./routes/bloodRequestRoutes');
 const db = require('./config/db');
 
 const app = express();
-// Start Server
-const PORT = process.env.PORT || 3003;
+
+
 
 // Routes
 app.use('/api/blood', bloodRoutes);
@@ -32,7 +32,7 @@ app.use(cors());
     console.error('Unable to connect to the database:', error);
   }
 })();
-
+const PORT = process.env.PORT || 3003;
 
 
 //Error handler
