@@ -1,4 +1,4 @@
-const express = require('express');
+/*const express = require('express');
 const { Sequelize } = require('sequelize');
 const routes = require('./routes/index.js');
 const db = require('./config/db.js');
@@ -21,4 +21,4 @@ app.use('/api/blood', routes);
   } catch (error) {
     console.error('Unable to connect to the database:', error);
   }
-})(); 
+})(); */

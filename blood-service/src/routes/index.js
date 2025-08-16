@@ -1,4 +1,4 @@
-const express = require('express');
+/*const express = require('express');
 const router = express.Router();
 const { Blood, BloodRequest } = require('../config/db').models;
 
@@ -12,3 +12,4 @@ router.post('/', async (req, res) => {
 });
 
 module.exports = router;
+*/
