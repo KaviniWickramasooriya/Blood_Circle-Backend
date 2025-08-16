@@ -1,18 +1,19 @@
 const express = require('express');
+
+const sequelize = require('./src/config/db.js');
+const cors = require('cors');
+
 const bloodRoutes = require('./routes/bloodRoutes');
 const bloodRequestRoutes = require('./routes/bloodRequestRoutes');
 const db = require('./config/db');
 
 const app = express();
-const PORT = process.env.PORT || 3003;
 
+
+//Middleware
 app.use(express.json());
-app.use('/api/blood', bloodRoutes);
-app.use('/api/blood-requests', bloodRequestRoutes);
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
-});
+app.use(cors());
+
 
 (async () => {
   try {
@@ -26,3 +27,15 @@ app.use((err, req, res, next) => {
     console.error('Unable to connect to the database:', error);
   }
 })();
+
+// Routes
+app.use('/api/blood', bloodRoutes);
+app.use('/api/blood-requests', bloodRequestRoutes);
+
+//Error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Something went wrong!' });
+});
+// Start Server
+const PORT = process.env.PORT || 3003;

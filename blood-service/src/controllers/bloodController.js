@@ -7,7 +7,7 @@ exports.createBlood = async (req, res) => {
     const blood = await Blood.create(req.body);
     res.status(201).json(blood);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    next(error);
   }
 };
 // Get single blood record by ID
@@ -20,7 +20,7 @@ exports.getBloodRecordById = async (req, res) => {
     }
     res.json(bloodRecord);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    next(error);
   }
 };
 exports.getAllBloodRecords = async (req, res) => {
@@ -28,7 +28,7 @@ exports.getAllBloodRecords = async (req, res) => {
     const bloodRecords = await Blood.findAll(); // Sequelize → findAll(), not find()
     res.json(bloodRecords);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    next(error);
   }
 };
 // Update blood record
@@ -40,7 +40,7 @@ exports.updateBloodRecord = async (req, res) => {
     await bloodRecord.update(req.body);
     res.json(bloodRecord);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    next(error);
   }
 };
 
@@ -53,7 +53,7 @@ exports.deleteBloodRecord = async (req, res) => {
     await bloodRecord.destroy();
     res.json({ message: 'Deleted successfully' });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    next(error);
   }
 };
 
