@@ -1,41 +1,41 @@
 const express = require('express');
-
-
-const { sequelize } = require('./config/db');
 const cors = require('cors');
+const { Sequelize } = require('sequelize');
+const db = require('./config/db.js');
 
 const bloodRoutes = require('./routes/bloodRoutes');
 const bloodRequestRoutes = require('./routes/bloodRequestRoutes');
-const db = require('./config/db');
 
 const app = express();
+const PORT = process.env.PORT || 3003;
 
-
-
-// Routes
-app.use('/api/blood', bloodRoutes);
-app.use('/api/blood-requests', bloodRequestRoutes);
-//Middleware
+// Middleware
 app.use(express.json());
 app.use(cors());
+
+
+app.use('/api/blood', bloodRoutes);
+app.use('/api/blood-requests', bloodRequestRoutes);
 
 // Initialize database and start server
 (async () => {
   try {
     await db.authenticate();
-    console.log('Database connected');
+    console.log('✅ Database connected');
+
     await db.sync();
+    console.log('✅ Database synced');
+
     app.listen(PORT, () => {
-      console.log(`Blood Service running on port ${PORT}`);
+      console.log(`🚀 Blood Service running on port ${PORT}`);
     });
   } catch (error) {
-    console.error('Unable to connect to the database:', error);
+    console.error(' Unable to connect to the database:', error);
+    process.exit(1);
   }
 })();
-const PORT = process.env.PORT || 3003;
 
-
-//Error handler
+// Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   if (err.name === 'SequelizeValidationError') {
