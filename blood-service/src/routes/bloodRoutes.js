@@ -10,7 +10,7 @@ router.get('/:id', bloodController.getBloodRecordById);
 router.post('/', bloodController.createBlood);
 router.put('/:id', bloodController.updateBloodRecord);
 router.delete('/:id', bloodController.deleteBloodRecord);
-
+router.put('/:id/add-quantity', bloodController.addBloodQuantity);
 
 
 

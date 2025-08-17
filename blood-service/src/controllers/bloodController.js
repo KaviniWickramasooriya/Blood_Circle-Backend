@@ -56,4 +56,26 @@ exports.deleteBloodRecord = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+exports.addBloodQuantity = async (req, res) => {
+  const { id } = req.params; // blood ID
+  const { quantity } = req.body; // amount to add
 
+  try {
+    const blood = await Blood.findByPk(id);
+    if (!blood) return res.status(404).json({ message: 'Blood type not found' });
+
+    // Increment quantity
+    await blood.increment('quantity', { by: quantity });
+
+    // Refresh the instance to get updated value
+    await blood.reload();
+
+    res.json({
+      message: `Added ${quantity} units to blood type ${blood.type}`,
+      blood
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};

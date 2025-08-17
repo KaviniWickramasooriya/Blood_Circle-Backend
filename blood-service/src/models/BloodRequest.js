@@ -5,14 +5,23 @@ module.exports = (sequelize) => {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true
+    }, blood_id: {   // 👈 foreign key column
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'blood', // must match tableName in Blood model
+        key: 'id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
     },
-    bloodType: {
+    /*bloodType: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
         isIn: [['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']] // Only valid blood types
       }
-    },
+    },*/
     quantity: {
       type: DataTypes.INTEGER,
       allowNull: false,

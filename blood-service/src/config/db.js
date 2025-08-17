@@ -14,6 +14,7 @@ const sequelize = new Sequelize(
 // Import models
 const Blood = require('../models/Blood')(sequelize);
 const BloodRequest = require('../models/BloodRequest')(sequelize);
+
 module.exports = {
   sequelize,
   models: {

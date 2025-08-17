@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-//const { Sequelize } = require('sequelize');
+const { sequelize } = require('./src/config/db');
+
 const db = require('./src/config/db');
 
 const bloodRoutes = require('./src/routes/bloodRoutes');
@@ -15,16 +16,16 @@ app.use(cors());
 
 
 app.use('/api/blood', bloodRoutes);
-app.use('/api/blood/blood-requests', bloodRequestRoutes);
+app.use('/api/blood-requests', bloodRequestRoutes);
 
 // Initialize database and start server
-/*(async () => {
+(async () => {
   try {
-    // await db.authenticate();
-    // console.log('✅ Database connected');
+    await sequelize.authenticate();
+     console.log('✅ Database connected');
 
-    // await db.sync();
-    // console.log('✅ Database synced');
+    await sequelize.sync();
+    console.log('✅ Database synced');
 
     app.listen(PORT, () => {
       console.log(`🚀 Blood Service running on port ${PORT}`);
@@ -33,20 +34,7 @@ app.use('/api/blood/blood-requests', bloodRequestRoutes);
     console.error(' Unable to connect to the database:', error);
     process.exit(1);
   }
-})();*/
-sequelize.authenticate()
-  .then(() => {
-    console.log('Database connected');
-    // Sync models with the database
-    return sequelize.sync({ force: false }); // Set to true only for development to drop and recreate tables
-  })
-  .then(() => {
-    console.log('Database synced successfully');
-  })
-  .catch(err => {
-    console.error('Database connection or sync error:', err);
-    process.exit(1); // Exit if connection or sync fails
-  });
+})();
 
 
 // Error handler
