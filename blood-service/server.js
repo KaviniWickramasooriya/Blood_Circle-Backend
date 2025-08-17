@@ -22,16 +22,16 @@ app.use('/api/blood-requests', bloodRequestRoutes);
 (async () => {
   try {
     await sequelize.authenticate();
-     console.log('✅ Database connected');
+     console.log('Database connected');
 
     await sequelize.sync();
-    console.log('✅ Database synced');
+    console.log('Database synced');
 
     app.listen(PORT, () => {
-      console.log(`🚀 Blood Service running on port ${PORT}`);
+      console.log(`Blood Service running on port ${PORT}`);
     });
   } catch (error) {
-    console.error(' Unable to connect to the database:', error);
+    console.error('Unable to connect to the database:', error);
     process.exit(1);
   }
 })();
