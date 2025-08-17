@@ -39,6 +39,11 @@ module.exports = (sequelize) => {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: DataTypes.NOW
+    },
+    status: {
+      type: DataTypes.ENUM('pending', 'approved', 'declined'),
+      allowNull: false,
+      defaultValue: 'pending'
     }
     },{
         tableName: 'blood_request', // Explicit table name (avoids Sequelize auto-pluralizing)
@@ -48,7 +53,8 @@ module.exports = (sequelize) => {
     BloodRequest.associate = (models) => {
         BloodRequest.belongsTo(models.Blood, { // many requests → one blood type
             foreignKey: 'blood_id',
-            as: 'blood'
+            as: 'blood',
+            onDelete: 'CASCADE'
         });
     };
     return BloodRequest;

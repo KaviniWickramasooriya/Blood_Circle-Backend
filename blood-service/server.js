@@ -18,7 +18,7 @@ app.use('/api/blood', bloodRoutes);
 app.use('/api/blood/blood-requests', bloodRequestRoutes);
 
 // Initialize database and start server
-(async () => {
+/*(async () => {
   try {
     // await db.authenticate();
     // console.log('✅ Database connected');
@@ -33,7 +33,21 @@ app.use('/api/blood/blood-requests', bloodRequestRoutes);
     console.error(' Unable to connect to the database:', error);
     process.exit(1);
   }
-})();
+})();*/
+sequelize.authenticate()
+  .then(() => {
+    console.log('Database connected');
+    // Sync models with the database
+    return sequelize.sync({ force: false }); // Set to true only for development to drop and recreate tables
+  })
+  .then(() => {
+    console.log('Database synced successfully');
+  })
+  .catch(err => {
+    console.error('Database connection or sync error:', err);
+    process.exit(1); // Exit if connection or sync fails
+  });
+
 
 // Error handler
 app.use((err, req, res, next) => {
