@@ -185,7 +185,6 @@ exports.getAllDonors = async (req, res) => {
         let genderName = 'Unknown';
         try {
           const response = await axios.get(`${gatewayService}/api/users/gender/genderById/${donor.genderId}`);
-          console.log(response.data);
           if (response.data) {
             genderName = response.data.data.name;
           }
@@ -220,7 +219,6 @@ exports.getAllDonors = async (req, res) => {
         };
       })
     );
-
     return res.status(200).json({
       message: 'Donors retrieved successfully',
       data: donorsWithData
