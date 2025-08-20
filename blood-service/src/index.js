@@ -1,10 +1,10 @@
-const express = require('express');
+/*const express = require('express');
 const { Sequelize } = require('sequelize');
-const routes = require('./routes');
-const db = require('./config/db');
+const routes = require('./routes/index.js');
+const db = require('./config/db.js');
 
 const app = express();
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 3003;
 
 app.use(express.json());
 app.use('/api/blood', routes);
@@ -21,4 +21,4 @@ app.use('/api/blood', routes);
   } catch (error) {
     console.error('Unable to connect to the database:', error);
   }
-})();
+})(); */
