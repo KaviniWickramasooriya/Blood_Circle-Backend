@@ -75,14 +75,30 @@ pipeline {
         BUILD_NUMBER = "${env.BUILD_NUMBER}"
     }
     stages {
+        // stage('SCM Checkout') {
+        //     steps {
+        //         retry(3) {
+        //             git branch: 'main', url: 'https://github.com/IreshEranga/lood-circle-backend.git'
+        //         }
+        //         bat 'dir' // Debug: List files in the workspace
+        //     }
+        // }
         stage('SCM Checkout') {
-            steps {
-                retry(3) {
-                    git branch: 'main', url: 'https://github.com/IreshEranga/lood-circle-backend.git'
-                }
-                bat 'dir' // Debug: List files in the workspace
-            }
+    steps {
+        retry(3) {
+            checkout scmGit(
+                branches: [[name: '*/main']],
+                extensions: [],
+                userRemoteConfigs: [[
+                    credentialsId: 'github_token_new',
+                    url: 'https://github.com/IreshEranga/lood-circle-backend.git'
+                ]]
+            )
         }
+        bat 'dir' // Debug: List files in the workspace
+    }
+}
+
         stage('Check Docker Daemon') { // Added to verify Docker connectivity
             steps {
                 script {
