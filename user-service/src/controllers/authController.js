@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { Admin, Donor } = require('../config/db').models;
+const { Admin, Donor, EventOrganiser } = require('../config/db').models;
 
 // Secret key for JWT
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -119,6 +119,11 @@ exports.adminLogin = async (req, res) => {
 // Donor login
 exports.donorLogin = async (req, res) => {
   return loginUser(Donor, 'Donor', req, res);
+};
+
+// Event Organisor login
+exports.organisorLogin = async (req, res) => {
+  return loginUser(EventOrganiser, 'EventOrganiser', req, res);
 };
 
 // Middleware to verify JWT token
