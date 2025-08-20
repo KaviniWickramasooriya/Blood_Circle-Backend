@@ -23,5 +23,17 @@ app.use(
     })
 );
 
+app.use(
+  "/api/blood",
+  createProxyMiddleware({
+    target: `${process.env.BLOOD_SERVICE}/api/blood`,
+    changeOrigin: true,
+    //pathRewrite: { "^/users/login": "/auth/login" },
+    on: {
+      proxyReq: fixRequestBody, 
+    },
+  })
+);
+
 
 app.listen(process.env.PORT, () => console.log(`API Gateway running on port ${process.env.PORT}`));

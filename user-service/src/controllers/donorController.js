@@ -155,3 +155,16 @@ exports.registerDonor = async (req, res) => {
     });
   }
 };
+
+exports.getDonorCount = async (req, res) => {
+  try {
+    const donorCount = await Donor.count();
+    res.status(200).json({ count: donorCount });
+  } catch (error) {
+    console.error('Error fetching donor count:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      details: 'An error occurred while fetching the donor count',
+    });
+  }
+};

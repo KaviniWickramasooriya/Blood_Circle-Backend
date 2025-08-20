@@ -9,12 +9,29 @@ module.exports = (sequelize) => {
     },
     type: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
+      validate: {
+        isIn: [['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']]
+      }
+      
     },
     quantity: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
+      validate: { min: 0 }
     }
+   }, {
+      tableName: 'blood',      // Explicit table name (avoids Sequelize auto-pluralizing)
+      timestamps: true,        // Adds createdAt & updatedAt fields automatically
+      underscored: true           // Uses snake_case column names in DB
+    
   });
+
+  Blood.associate = (models) => {
+    Blood.hasMany(models.BloodRequest, {  // one blood type → many requests
+      foreignKey: 'blood_id',
+      as: 'requests'
+    });
+  };
   return Blood;
 };
