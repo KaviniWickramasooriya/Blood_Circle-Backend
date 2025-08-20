@@ -1,5 +1,4 @@
-
-const { Blood } = require('../config/db').models;
+const { Blood } = require("../config/db").models;
 //const bcrypt = require('bcrypt');
 
 exports.createBlood = async (req, res) => {
@@ -16,7 +15,7 @@ exports.getBloodRecordById = async (req, res) => {
     const bloodRecord = await Blood.findByPk(req.params.id);
 
     if (!bloodRecord) {
-      return res.status(404).json({ message: 'Blood record not found' });
+      return res.status(404).json({ message: "Blood record not found" });
     }
     res.json(bloodRecord);
   } catch (err) {
@@ -35,7 +34,7 @@ exports.getAllBloodRecords = async (req, res) => {
 exports.updateBloodRecord = async (req, res) => {
   try {
     const bloodRecord = await Blood.findByPk(req.params.id);
-    if (!bloodRecord) return res.status(404).json({ message: 'Not found' });
+    if (!bloodRecord) return res.status(404).json({ message: "Not found" });
 
     await bloodRecord.update(req.body);
     res.json(bloodRecord);
@@ -48,12 +47,39 @@ exports.updateBloodRecord = async (req, res) => {
 exports.deleteBloodRecord = async (req, res) => {
   try {
     const bloodRecord = await Blood.findByPk(req.params.id);
-    if (!bloodRecord) return res.status(404).json({ message: 'Not found' });
+    if (!bloodRecord) return res.status(404).json({ message: "Not found" });
 
     await bloodRecord.destroy();
-    res.json({ message: 'Deleted successfully' });
+    res.json({ message: "Deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: error.message });
   }
 };
 
+exports.addBloodQuantity = async (req, res) => {
+  const { id } = req.params;
+  const quantityToAdd = Number(req.body.quantity);
+
+  if (isNaN(quantityToAdd) || quantityToAdd <= 0) {
+    return res
+      .status(400)
+      .json({ error: "Quantity must be a positive number" });
+  }
+
+  try {
+    const blood = await Blood.findByPk(id);
+    if (!blood)
+      return res.status(404).json({ message: "Blood type not found" });
+
+    await blood.increment("quantity", { by: quantityToAdd });
+    await blood.reload();
+
+    res.status(200).json({
+      message: `Added ${quantityToAdd} units to blood type ${blood.type}`,
+      blood,
+    });
+  } catch (error) {
+    console.error("Error adding blood quantity:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};

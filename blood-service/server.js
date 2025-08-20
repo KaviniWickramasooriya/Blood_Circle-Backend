@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-//const { Sequelize } = require('sequelize');
+const { sequelize } = require('./src/config/db');
+
 const db = require('./src/config/db');
 
 const bloodRoutes = require('./src/routes/bloodRoutes');
@@ -15,25 +16,26 @@ app.use(cors());
 
 
 app.use('/api/blood', bloodRoutes);
-app.use('/api/blood/blood-requests', bloodRequestRoutes);
+app.use('/api/blood-requests', bloodRequestRoutes);
 
 // Initialize database and start server
 (async () => {
   try {
-    // await db.authenticate();
-    // console.log('✅ Database connected');
+    await sequelize.authenticate();
+     console.log('Database connected');
 
-    // await db.sync();
-    // console.log('✅ Database synced');
+    await sequelize.sync();
+    console.log('Database synced');
 
     app.listen(PORT, () => {
-      console.log(`🚀 Blood Service running on port ${PORT}`);
+      console.log(`Blood Service running on port ${PORT}`);
     });
   } catch (error) {
-    console.error(' Unable to connect to the database:', error);
+    console.error('Unable to connect to the database:', error);
     process.exit(1);
   }
 })();
+
 
 // Error handler
 app.use((err, req, res, next) => {

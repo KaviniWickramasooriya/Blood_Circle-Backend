@@ -19,7 +19,8 @@ module.exports = (sequelize) => {
       type: DataTypes.INTEGER,
       allowNull: false,
       validate: { min: 0 }
-    }
+    },
+    
    }, {
       tableName: 'blood',      // Explicit table name (avoids Sequelize auto-pluralizing)
       timestamps: true,        // Adds createdAt & updatedAt fields automatically
@@ -30,7 +31,10 @@ module.exports = (sequelize) => {
   Blood.associate = (models) => {
     Blood.hasMany(models.BloodRequest, {  // one blood type → many requests
       foreignKey: 'blood_id',
-      as: 'requests'
+      as: 'requests',
+       onDelete: 'CASCADE'
+      
+
     });
   };
   return Blood;
