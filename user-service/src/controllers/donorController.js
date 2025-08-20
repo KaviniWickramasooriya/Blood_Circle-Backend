@@ -1,5 +1,8 @@
 const { Donor, Role } = require('../config/db').models;
 const bcrypt = require('bcrypt');
+const axios = require('axios');
+
+
 
 exports.registerDonor = async (req, res) => {
   try {
@@ -175,9 +178,52 @@ exports.getAllDonors = async (req, res) => {
       attributes: { exclude: ['password'] }
     });
 
+    const gatewayService = process.env.GATEWAY_SERVICE || 'http://localhost:3000';
+
+    const donorsWithData = await Promise.all(
+      donors.map(async (donor) => {
+        let genderName = 'Unknown';
+        try {
+          const response = await axios.get(`${gatewayService}/api/users/gender/genderById/${donor.genderId}`);
+          console.log(response.data);
+          if (response.data) {
+            genderName = response.data.data.name;
+          }
+        } catch (error) {
+          console.error(`Failed to fetch gender for donor ${donor.id}:`, error.message);
+        }
+
+        let bloodTypeName = 'Unknown';
+        try {
+          const response = await axios.get(`${gatewayService}/api/blood/${donor.bloodType}`);
+          if (response.data) {
+            bloodTypeName = response.data.type;
+          }
+        } catch (error) {
+          console.error(`Failed to fetch gender for donor ${donor.id}:`, error.message);
+        }
+        return {
+          id: donor.id,
+          name: donor.name,
+          email: donor.email,
+          bloodType: donor.bloodType,
+          bloodTypeName: bloodTypeName,
+          dateOfBirth: donor.dateOfBirth,
+          nic: donor.nic,
+          address: donor.address,
+          genderId: donor.genderId,
+          gender: genderName,
+          roleId: donor.roleId,
+          telephoneNo: donor.telephoneNo,
+          createdAt: donor.createdAt,
+          updatedAt: donor.updatedAt
+        };
+      })
+    );
+
     return res.status(200).json({
       message: 'Donors retrieved successfully',
-      data: donors
+      data: donorsWithData
     });
   } catch (error) {
     console.error('Error fetching donors:', error);
