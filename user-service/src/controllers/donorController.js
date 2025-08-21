@@ -244,6 +244,7 @@ exports.getDonorById = async (req, res) => {
       });
     }
 
+    //Find Donor
     const donor = await Donor.findByPk(id, {
       attributes: { exclude: ['password'] }
     });
