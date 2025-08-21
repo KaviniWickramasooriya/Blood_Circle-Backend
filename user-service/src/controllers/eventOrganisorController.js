@@ -114,3 +114,17 @@ exports.createEventOrganiser = async (req, res) => {
     });
   }
 };
+
+
+exports.getOrganisorCount = async (req, res) => {
+  try {
+    const organisorCount = await EventOrganiser.count();
+    res.status(200).json({ count: organisorCount });
+  } catch (error) {
+    console.error('Error fetching organisor count:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      details: 'An error occurred while fetching the organisor count',
+    });
+  }
+};
