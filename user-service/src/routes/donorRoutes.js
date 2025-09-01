@@ -5,5 +5,9 @@ const authMiddleware = require("../middleware/auth");
 
 router.post('/register', donorController.registerDonor);
 router.get('/count',authMiddleware('Admin'), donorController.getDonorCount);
+router.get('/', authMiddleware('Admin'), donorController.getAllDonors);
+router.get('/:id', authMiddleware('Admin'), donorController.getDonorById);
+router.put('/:id', authMiddleware('Admin'), donorController.updateDonor);
+router.delete('/:id', authMiddleware('Admin'), donorController.deleteDonor);
 
 module.exports = router;

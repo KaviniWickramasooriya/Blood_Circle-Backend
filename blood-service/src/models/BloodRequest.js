@@ -5,14 +5,23 @@ module.exports = (sequelize) => {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true
+    }, blood_id: {   // 👈 foreign key column
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'blood', // must match tableName in Blood model
+        key: 'id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
     },
-    bloodType: {
+    /*bloodType: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
         isIn: [['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']] // Only valid blood types
       }
-    },
+    },*/
     quantity: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -39,6 +48,11 @@ module.exports = (sequelize) => {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: DataTypes.NOW
+    },
+    status: {
+      type: DataTypes.ENUM('pending', 'approved', 'declined'),
+      allowNull: false,
+      defaultValue: 'pending'
     }
     },{
         tableName: 'blood_request', // Explicit table name (avoids Sequelize auto-pluralizing)
@@ -48,7 +62,8 @@ module.exports = (sequelize) => {
     BloodRequest.associate = (models) => {
         BloodRequest.belongsTo(models.Blood, { // many requests → one blood type
             foreignKey: 'blood_id',
-            as: 'blood'
+            as: 'blood',
+            onDelete: 'CASCADE'
         });
     };
     return BloodRequest;
