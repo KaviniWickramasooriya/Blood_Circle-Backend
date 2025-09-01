@@ -1,12 +1,41 @@
-const { BloodRequest } = require('../config/db').models;
+const { BloodRequest,Blood } = require('../config/db').models;
 
 // Create new blood request
 exports.createBloodRequest = async (req, res) => {
+  const { blood_id, quantity, name, contactNumber, email } = req.body;
+
   try {
-    const bloodRequest = await BloodRequest.create(req.body);
-    res.status(201).json(bloodRequest);
+    // 1. Check if blood type exists
+    const blood = await Blood.findByPk(blood_id);
+    if (!blood) {
+      return res.status(404).json({ error: 'Blood type not found' });
+    }
+
+    // 2. Check stock availability
+    if (blood.quantity < quantity) {
+      return res.status(400).json({ error: 'Not enough blood units available' });
+    }
+
+    // 3. Create blood request
+    const bloodRequest = await BloodRequest.create({
+      blood_id,
+      quantity,
+      name,
+      contactNumber,
+      email
+    });
+
+    // 4. Deduct stock
+    blood.quantity -= quantity;
+    await blood.save();
+
+    res.status(201).json({
+      message: 'Blood request created successfully',
+      request: bloodRequest
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
   }
 };
 
@@ -67,6 +96,7 @@ exports.deleteBloodRequest = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 /*const page = parseInt(req.query.page) || 1;
 const limit = parseInt(req.query.limit) || 10;
