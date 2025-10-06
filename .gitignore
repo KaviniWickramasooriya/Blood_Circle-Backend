@@ -4,3 +4,9 @@
 /user-service/node_modules
 BloodCircleTokenGitHub.txt
 BloodCircleTokenGitHub.txt
+
+
+/api-gateway/.env
+/blood-service/.env
+/event-service/.env
+/user-service/.env  
