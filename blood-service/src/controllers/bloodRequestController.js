@@ -1,4 +1,6 @@
 const { BloodRequest,Blood } = require('../config/db').models;
+const sendEmail = require('../utils/sendEmails');
+
 
 // Create new blood request
 exports.createBloodRequest = async (req, res) => {
@@ -102,7 +104,7 @@ exports.updateBloodRequestStatus = async (req, res) => {
   const { status } = req.body; // 'pending', 'approved', 'declined'
 
   try {
-    // Validate status value
+    // Validate status
     if (!['pending', 'approved', 'declined'].includes(status)) {
       return res.status(400).json({ error: 'Invalid status value' });
     }
@@ -113,7 +115,7 @@ exports.updateBloodRequestStatus = async (req, res) => {
       return res.status(404).json({ message: 'Blood request not found' });
     }
 
-    // If admin approves → reduce blood stock
+    // If approved → reduce blood stock
     if (status === 'approved') {
       const blood = request.blood;
       if (blood.quantity < request.quantity) {
@@ -123,10 +125,48 @@ exports.updateBloodRequestStatus = async (req, res) => {
       await blood.save();
     }
 
-    // If admin declines → no stock change, just update status
+    // Update status
     request.status = status;
     await request.save();
 
+    // ✅ Send email notification
+    let subject, message;
+
+    if (status === 'approved') {
+      subject = 'Your Blood Request Has Been Approved';
+      message = `Dear ${request.name},
+
+Your blood request for ${request.quantity} unit(s) of ${request.blood.bloodType} has been approved.
+
+You can collect it at your registered hospital.
+
+Thank you,
+Blood Donation Service`;
+    } else if (status === 'declined') {
+      subject = 'Your Blood Request Has Been Declined';
+      message = `Dear ${request.name},
+
+We’re sorry to inform you that your blood request for ${request.quantity} unit(s) of ${request.blood.bloodType} has been declined.
+
+Please contact us for more details.
+
+Best regards,
+Blood Donation Service`;
+    } else {
+      subject = 'Your Blood Request Is Pending';
+      message = `Dear ${request.name},
+
+Your blood request for ${request.quantity} unit(s) of ${request.blood.bloodType} is currently pending review.
+
+We’ll update you soon.
+
+Best regards,
+Blood Donation Service`;
+    }
+
+    await sendEmail(request.email, subject, message);
+
+    // ✅ Response to client
     res.json({
       message: `Blood request ${status} successfully.`,
       request
@@ -137,6 +177,7 @@ exports.updateBloodRequestStatus = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+
 
 
 /*const page = parseInt(req.query.page) || 1;
