@@ -1,6 +1,8 @@
 const { Op } = require('sequelize');
 const sequelize = require('../config/db');
 const Event = require('../models/Event')(sequelize);
+const { getOrganizerEmail } = require('../services/userService');
+const { sendApprovalEmail } = require('../services/emailService');
 
 // Helper function to filter events based on user type
 const filterEventsByUser = async (req, userType, organizerId = null) => {
@@ -269,6 +271,13 @@ const approveEvent = async (req, res) => {
         success: false,
         error: 'Pending event not found'
       });
+    }
+
+    // If approved, send email notification to organizer
+    if (status === 'approved') {
+      const event = await Event.findByPk(id);
+      const organizerEmail = await getOrganizerEmail(event.organizerId);
+      await sendApprovalEmail(organizerEmail, event.name);
     }
 
     res.json({
