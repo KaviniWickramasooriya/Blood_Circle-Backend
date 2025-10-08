@@ -10,7 +10,6 @@ const filterEventsByUser = async (req, userType, organizerId = null) => {
   if (userType === 'EventOrganiser') {
     whereClause.organizerId = organizerId;
   }
-  // For admin, no filter (all events)
   return whereClause;
 };
 
@@ -18,7 +17,7 @@ const filterEventsByUser = async (req, userType, organizerId = null) => {
 const createEvent = async (req, res) => {
   try {
     const { name, date, time, endTime, location, district, description, expectedParticipants, maxCapacity } = req.body;
-    const organizerId = req.user.id; // From auth middleware
+    const organizerId = req.user.id;
 
     const event = await Event.create({
       name,
@@ -31,7 +30,7 @@ const createEvent = async (req, res) => {
       organizerId,
       expectedParticipants,
       maxCapacity,
-      status: 'pending' // Default for new events
+      status: 'pending'
     });
 
     res.status(201).json({
@@ -74,7 +73,7 @@ const getAllEvents = async (req, res) => {
       limit: parseInt(limit),
       offset: parseInt(offset),
       order: [['createdAt', 'DESC']],
-      attributes: { exclude: ['updatedAt'] } // Exclude if not needed
+      attributes: { exclude: ['updatedAt'] }
     });
 
     res.json({
@@ -162,22 +161,26 @@ const getEventById = async (req, res) => {
   }
 };
 
-// Update event (organizer can update own any events, set to pending; admin can update any)
+// Update event (organizer can update own events, set to pending; admin can update any)
 const updateEvent = async (req, res) => {
   try {
     const { id } = req.params;
-    let updates = req.body;
+    let updates = { ...req.body };
     const userType = req.user.userType;
 
     let whereClause = { id };
     if (userType === 'EventOrganiser') {
       whereClause.organizerId = req.user.id;
-      // Ignore any status sent by organizer
-      delete updates.status;
-      // Set status to pending on update
-      updates.status = 'pending';
+      delete updates.status; // Organizers cannot set status
+      updates.status = 'pending'; // Reset to pending on organizer update
     }
-    // Admin can update anything, including status
+
+    // Ensure optional fields are properly handled
+    if (updates.expectedParticipants === '') updates.expectedParticipants = null;
+    if (updates.maxCapacity === '') updates.maxCapacity = null;
+    if (updates.description === '') updates.description = null;
+    if (updates.time === '') updates.time = null;
+    if (updates.endTime === '') updates.endTime = null;
 
     const [updatedRows] = await Event.update(updates, {
       where: whereClause,
@@ -191,7 +194,6 @@ const updateEvent = async (req, res) => {
       });
     }
 
-    // Fetch updated event
     const updatedEvent = await Event.findByPk(id);
     res.json({
       success: true,
@@ -216,7 +218,6 @@ const deleteEvent = async (req, res) => {
     let whereClause = { id };
     if (userType === 'EventOrganiser') {
       whereClause.organizerId = req.user.id;
-      // Can delete any own event, no status restriction
     }
 
     const deletedRows = await Event.destroy({ where: whereClause });
@@ -252,7 +253,7 @@ const approveEvent = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { status, rejectionReason } = req.body; // status: 'approved' or 'rejected'
+    const { status, rejectionReason } = req.body;
 
     if (!['approved', 'rejected'].includes(status)) {
       return res.status(400).json({
@@ -273,7 +274,6 @@ const approveEvent = async (req, res) => {
       });
     }
 
-    // If approved, send email notification to organizer
     if (status === 'approved') {
       const event = await Event.findByPk(id);
       const organizerEmail = await getOrganizerEmail(event.organizerId);
@@ -290,7 +290,7 @@ const approveEvent = async (req, res) => {
       success: false,
       error: error.message || 'Failed to approve event'
     });
-  }   
+  }
 };
 
 module.exports = {
