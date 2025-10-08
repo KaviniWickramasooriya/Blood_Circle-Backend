@@ -5,6 +5,7 @@ const authController = require('../controllers/authController');
 // Public routes
 router.post('/admin/login', authController.adminLogin);
 router.post('/donor/login', authController.donorLogin);
+router.post('/organisor/login', authController.organisorLogin);
 
 // Protected routes (examples)
 // router.get(
