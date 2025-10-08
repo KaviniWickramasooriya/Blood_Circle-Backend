@@ -2,8 +2,6 @@ const { Donor, Role } = require('../config/db').models;
 const bcrypt = require('bcrypt');
 const axios = require('axios');
 
-
-
 exports.registerDonor = async (req, res) => {
   try {
     const {
@@ -60,6 +58,9 @@ exports.registerDonor = async (req, res) => {
       });
     }
 
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 12);
+
     // Fetch the roleId for "Donor" from the Roles table
     const donorRole = await Role.findOne({ where: { name: 'Donor' } });
     if (!donorRole) {
@@ -74,7 +75,7 @@ exports.registerDonor = async (req, res) => {
     const donor = await Donor.create({
       name,
       email,
-      password,
+      password: hashedPassword,
       bloodType,
       dateOfBirth,
       nic,
@@ -132,7 +133,7 @@ exports.registerDonor = async (req, res) => {
 
     // Handle foreign key constraint errors (e.g., invalid genderId or roleId)
     if (error.name === 'SequelizeForeignKeyConstraintError') {
-      const field = error.fields[0];
+      const field = Object.keys(error.fields)[0];
       return res.status(400).json({
         error: 'Foreign key constraint failed',
         details: {
@@ -185,7 +186,7 @@ exports.getAllDonors = async (req, res) => {
         let genderName = 'Unknown';
         try {
           const response = await axios.get(`${gatewayService}/api/users/gender/genderById/${donor.genderId}`);
-          if (response.data) {
+          if (response.data && response.data.data) {
             genderName = response.data.data.name;
           }
         } catch (error) {
@@ -199,7 +200,7 @@ exports.getAllDonors = async (req, res) => {
             bloodTypeName = response.data.type;
           }
         } catch (error) {
-          console.error(`Failed to fetch gender for donor ${donor.id}:`, error.message);
+          console.error(`Failed to fetch blood type for donor ${donor.id}:`, error.message);
         }
         return {
           id: donor.id,
@@ -269,6 +270,80 @@ exports.getDonorById = async (req, res) => {
   }
 };
 
+exports.getDonorProfile = async (req, res) => {
+  try {
+    const donorId = req.user.id;
+
+    if (!donorId || isNaN(donorId)) {
+      return res.status(400).json({
+        error: 'Invalid donor ID',
+        details: 'Donor ID must be a valid number'
+      });
+    }
+
+    const donor = await Donor.findByPk(donorId, {
+      attributes: { exclude: ['password'] }
+    });
+
+    if (!donor) {
+      return res.status(404).json({
+        error: 'Donor not found',
+        details: `No donor found with ID ${donorId}`
+      });
+    }
+
+    const gatewayService = process.env.GATEWAY_SERVICE || 'http://localhost:3000';
+
+    let genderName = 'Unknown';
+    try {
+      const response = await axios.get(`${gatewayService}/api/users/gender/genderById/${donor.genderId}`);
+      if (response.data && response.data.data) {
+        genderName = response.data.data.name;
+      }
+    } catch (error) {
+      console.error(`Failed to fetch gender for donor ${donorId}:`, error.message);
+    }
+
+    let bloodTypeName = 'Unknown';
+    try {
+      const response = await axios.get(`${gatewayService}/api/blood/${donor.bloodType}`);
+      if (response.data) {
+        bloodTypeName = response.data.type;
+      }
+    } catch (error) {
+      console.error(`Failed to fetch blood type for donor ${donorId}:`, error.message);
+    }
+
+    const donorResponse = {
+      id: donor.id,
+      name: donor.name,
+      email: donor.email,
+      bloodType: donor.bloodType,
+      bloodTypeName: bloodTypeName,
+      dateOfBirth: donor.dateOfBirth,
+      nic: donor.nic,
+      address: donor.address,
+      genderId: donor.genderId,
+      gender: genderName,
+      roleId: donor.roleId,
+      telephoneNo: donor.telephoneNo,
+      createdAt: donor.createdAt,
+      updatedAt: donor.updatedAt
+    };
+
+    return res.status(200).json({
+      message: 'Donor profile retrieved successfully',
+      data: donorResponse
+    });
+  } catch (error) {
+    console.error('Error fetching donor profile:', error);
+    return res.status(500).json({
+      error: 'Internal server error',
+      details: 'An error occurred while fetching the donor profile'
+    });
+  }
+};
+
 exports.updateDonor = async (req, res) => {
   try {
     const { id } = req.params;
@@ -326,13 +401,17 @@ exports.updateDonor = async (req, res) => {
     const updatedFields = {};
     if (name) updatedFields.name = name;
     if (email) updatedFields.email = email;
-    if (password) updatedFields.password = password;
     if (bloodType) updatedFields.bloodType = bloodType;
     if (dateOfBirth) updatedFields.dateOfBirth = dateOfBirth;
     if (nic) updatedFields.nic = nic;
     if (address) updatedFields.address = address;
     if (genderId) updatedFields.genderId = genderId;
     if (telephoneNo) updatedFields.telephoneNo = telephoneNo;
+
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 12);
+      updatedFields.password = hashedPassword;
+    }
 
     await donor.update(updatedFields);
 
@@ -383,7 +462,7 @@ exports.updateDonor = async (req, res) => {
 
     // Handle foreign key constraint errors
     if (error.name === 'SequelizeForeignKeyConstraintError') {
-      const field = error.fields[0];
+      const field = Object.keys(error.fields)[0];
       return res.status(400).json({
         error: 'Foreign key constraint failed',
         details: {
