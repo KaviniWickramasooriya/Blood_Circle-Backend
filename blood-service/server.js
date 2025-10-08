@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const { sequelize } = require('./src/config/db');
 
+
+
 const db = require('./src/config/db');
 
 const bloodRoutes = require('./src/routes/bloodRoutes');
@@ -16,7 +18,7 @@ app.use(cors());
 
 
 app.use('/api/blood', bloodRoutes);
-app.use('/api/blood/blood-requests', bloodRequestRoutes);
+app.use('/api/blood-requests', bloodRequestRoutes);
 
 // Initialize database and start server
 (async () => {
@@ -26,6 +28,8 @@ app.use('/api/blood/blood-requests', bloodRequestRoutes);
 
     await sequelize.sync();
     console.log('Database synced');
+    
+    console.log('Loaded models:', Object.keys(sequelize.models));
 
     app.listen(PORT, () => {
       console.log(`Blood Service running on port ${PORT}`);

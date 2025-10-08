@@ -1,4 +1,4 @@
-const { BloodRequest,Blood } = require('../config/db').models;
+const { BloodRequest } = require('../config/db').models;
 const sendEmail = require('../utils/sendEmails');
 
 
@@ -8,7 +8,7 @@ exports.createBloodRequest = async (req, res) => {
 
   try {
     // 1. Check if blood type exists
-    const blood = await Blood.findByPk(blood_id);
+    const blood = await BloodRequest.findByPk(blood_id);
     if (!blood) {
       return res.status(404).json({ error: 'Blood type not found' });
     }
@@ -41,17 +41,35 @@ exports.createBloodRequest = async (req, res) => {
   }
 };
 
-// Get all blood requests
-exports.getAllBloodRequests = async (req, res) => {
+/* exports.getAllBloodRequests = async (req, res) => {
   try {
     const requests = await BloodRequest.findAll({
-      include: { association: 'blood' } // ✅ joins Blood table
+      include: [
+        {
+          model: Blood,
+          as: 'blood', // must match the alias in BloodRequest.associate
+          required: false // Use left join to include requests even if blood type is missing
+        },
+      ],
     });
     res.json(requests);
   } catch (error) {
+    console.error('Error fetching blood requests:', error);
+    res.status(500).json({ error: error.message });
+  }
+}; */
+
+exports.getAllBloodRequests = async (req, res) => {
+  try {
+    // Fetch all BloodRequest records without joining Blood
+    const requests = await BloodRequest.findAll();
+    res.json(requests);
+  } catch (error) {
+    console.error('Error fetching blood requests:', error);
     res.status(500).json({ error: error.message });
   }
 };
+
 
 // Get single blood request by ID
 exports.getBloodRequestById = async (req, res) => {
@@ -129,7 +147,7 @@ exports.updateBloodRequestStatus = async (req, res) => {
     request.status = status;
     await request.save();
 
-    // ✅ Send email notification
+    // Send email notification
     let subject, message;
 
     if (status === 'approved') {

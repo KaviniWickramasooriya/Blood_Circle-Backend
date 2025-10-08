@@ -7,7 +7,7 @@ const bloodRequestController = require('../controllers/bloodRequestController');
 
 
 router.post('/', bloodRequestController.createBloodRequest);
-router.get('/', bloodRequestController.getAllBloodRequests);
+router.get('/', bloodRequestController.getAllBloodRequests); 
 router.get('/:id', bloodRequestController.getBloodRequestById);
 router.put('/:id', bloodRequestController.updateBloodRequest);
 router.delete('/:id', bloodRequestController.deleteBloodRequest);

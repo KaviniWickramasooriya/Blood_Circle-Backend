@@ -13,9 +13,10 @@ exports.createBlood = async (req, res) => {
 exports.getBloodRecordById = async (req, res) => {
   try {
     const bloodRecord = await Blood.findByPk(req.params.id);
+    console.log(bloodRecord);
 
     if (!bloodRecord) {
-      return res.status(404).json({ message: "Blood record not found" });
+     return res.status(404).json({ message: "Blood record not :(" });
     }
     res.json(bloodRecord);
   } catch (err) {

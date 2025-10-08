@@ -18,11 +18,12 @@ const BloodRequest = require('../models/BloodRequest')(sequelize);
 const models = { Blood, BloodRequest };
 
 
-Object.keys(models).forEach(modelName => {
-  if (models[modelName].associate) {
-    models[modelName].associate(models);
+Object.values(models).forEach((model) => {
+  if (typeof model.associate === 'function') {
+    model.associate(models);
   }
 });
+console.log('Loaded models:', Object.keys(sequelize.models));
 
 module.exports = {
   sequelize,
