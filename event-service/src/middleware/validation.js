@@ -33,7 +33,7 @@ const validateEventCreation = (req, res, next) => {
       'string.max': 'District cannot exceed 100 characters',
       'any.required': 'District is required'
     }),
-    description: Joi.string().max(1000).allow('').messages({
+    description: Joi.string().max(1000).allow('', null).messages({
       'string.max': 'Description cannot exceed 1000 characters'
     }),
     expectedParticipants: Joi.number().integer().min(0).allow(null).messages({
@@ -62,44 +62,44 @@ const validateEventCreation = (req, res, next) => {
 
 const validateEventUpdate = (req, res, next) => {
   const schema = Joi.object({
-    name: Joi.string().min(2).max(255).allow(null, '').messages({
+    name: Joi.string().min(2).max(255).optional().messages({
       'string.base': 'Event name must be a string',
       'string.min': 'Event name must be at least 2 characters long',
       'string.max': 'Event name cannot exceed 255 characters'
     }),
-    date: Joi.date().iso().allow(null).messages({
+    date: Joi.date().iso().optional().messages({
       'date.base': 'Event date must be a valid date'
     }),
-    time: Joi.string().pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).allow(null, '').messages({
+    time: Joi.string().pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).allow('', null).optional().messages({
       'string.pattern.base': 'Event time must be in HH:MM format'
     }),
-    endTime: Joi.string().pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).allow(null, '').messages({
+    endTime: Joi.string().pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).allow('', null).optional().messages({
       'string.pattern.base': 'Event end time must be in HH:MM format'
     }),
-    location: Joi.string().min(2).max(500).allow(null, '').messages({
+    location: Joi.string().min(2).max(500).optional().messages({
       'string.base': 'Location must be a string',
       'string.min': 'Location must be at least 2 characters long',
       'string.max': 'Location cannot exceed 500 characters'
     }),
-    district: Joi.string().min(2).max(100).allow(null, '').messages({
+    district: Joi.string().min(2).max(100).optional().messages({
       'string.base': 'District must be a string',
       'string.min': 'District must be at least 2 characters long',
       'string.max': 'District cannot exceed 100 characters'
     }),
-    description: Joi.string().max(1000).allow(null, '').messages({
+    description: Joi.string().max(1000).allow('', null).optional().messages({
       'string.max': 'Description cannot exceed 1000 characters'
     }),
-    expectedParticipants: Joi.number().integer().min(0).allow(null).messages({
+    expectedParticipants: Joi.number().integer().min(0).allow(null).optional().messages({
       'number.base': 'Expected participants must be a valid number',
       'number.integer': 'Expected participants must be an integer',
       'number.min': 'Expected participants cannot be negative'
     }),
-    maxCapacity: Joi.number().integer().min(1).allow(null).messages({
+    maxCapacity: Joi.number().integer().min(1).allow(null).optional().messages({
       'number.base': 'Max capacity must be a valid number',
       'number.integer': 'Max capacity must be an integer',
       'number.min': 'Max capacity must be at least 1'
     }),
-    status: Joi.string().valid('pending', 'approved', 'rejected', 'cancelled').allow(null).messages({
+    status: Joi.string().valid('pending', 'approved', 'rejected', 'cancelled').optional().messages({
       'any.only': 'Invalid status value'
     })
   });
@@ -122,7 +122,7 @@ const validateEventApproval = (req, res, next) => {
       'any.only': 'Status must be "approved" or "rejected"',
       'any.required': 'Status is required'
     }),
-    rejectionReason: Joi.string().max(500).allow(null, '').when('status', {
+    rejectionReason: Joi.string().max(500).allow('', null).when('status', {
       is: 'rejected',
       then: Joi.string().min(1).required().messages({
         'string.min': 'Rejection reason is required when rejecting',

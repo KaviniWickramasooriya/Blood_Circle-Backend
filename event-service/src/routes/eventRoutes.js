@@ -25,8 +25,8 @@ router.use(requireAuth);
 router.post('/', requireEventOrganizer, validateEventCreation, createEvent);
 router.get('/', getAllEvents);
 router.get('/:id', getEventById);
-router.put('/:id', validateEventUpdate, updateEvent);
-router.delete('/:id', deleteEvent);
+router.put('/:id', requireEventOrganizer, validateEventUpdate, updateEvent);
+router.delete('/:id', requireEventOrganizer, deleteEvent);
 
 // Admin route for approvals
 router.patch('/:id/approve', requireAdmin, validateEventApproval, approveEvent);
