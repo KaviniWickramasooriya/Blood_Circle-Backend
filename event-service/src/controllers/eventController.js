@@ -2,7 +2,7 @@ const { Op } = require('sequelize');
 const sequelize = require('../config/db');
 const Event = require('../models/Event')(sequelize);
 const { getOrganizerEmail } = require('../services/userService');
-const { sendApprovalEmail } = require('../services/emailService');
+const { sendApprovalEmail, sendRejectionEmail } = require('../services/emailService');
 
 // Helper function to filter events based on user type
 const filterEventsByUser = async (req, userType, organizerId = null) => {
@@ -274,10 +274,32 @@ const approveEvent = async (req, res) => {
       });
     }
 
+    // Handle notifications (non-blocking for approval/rejection)
     if (status === 'approved') {
-      const event = await Event.findByPk(id);
-      const organizerEmail = await getOrganizerEmail(event.organizerId);
-      await sendApprovalEmail(organizerEmail, event.name);
+      try {
+        const event = await Event.findByPk(id);
+        const organizerEmail = await getOrganizerEmail(event.organizerId);
+        if (organizerEmail) {
+          await sendApprovalEmail(organizerEmail, event.name);
+        } else {
+          console.warn(`No email sent for approved event "${event.name}" - organizer not found`);
+        }
+      } catch (emailError) {
+        console.warn('Approval succeeded, but email notification failed:', emailError.message);
+        // Optionally log to a queue for retry (e.g., BullMQ or similar)
+      }
+    } else if (status === 'rejected') {
+      try {
+        const event = await Event.findByPk(id);
+        const organizerEmail = await getOrganizerEmail(event.organizerId);
+        if (organizerEmail) {
+          await sendRejectionEmail(organizerEmail, event.name, rejectionReason);
+        } else {
+          console.warn(`No email sent for rejected event "${event.name}" - organizer not found`);
+        }
+      } catch (emailError) {
+        console.warn('Rejection succeeded, but email notification failed:', emailError.message);
+      }
     }
 
     res.json({
@@ -286,7 +308,7 @@ const approveEvent = async (req, res) => {
     });
   } catch (error) {
     console.error('Error approving event:', error);
-    res.status(400).json({
+    res.status(500).json({
       success: false,
       error: error.message || 'Failed to approve event'
     });
