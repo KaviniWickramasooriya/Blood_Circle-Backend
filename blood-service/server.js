@@ -17,8 +17,11 @@ app.use(express.json());
 app.use(cors());
 
 
-app.use('/api/blood', bloodRoutes);
-app.use('/api/blood-requests', bloodRequestRoutes);
+// app.use('/api/blood', bloodRoutes);
+// app.use('/api/blood-requests', bloodRequestRoutes);
+
+app.use('/api/blood/v1', bloodRoutes);
+app.use('/api/blood/blood-requests', bloodRequestRoutes);
 
 // Initialize database and start server
 (async () => {
