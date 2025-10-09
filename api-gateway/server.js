@@ -35,5 +35,17 @@ app.use(
   })
 );
 
+app.use(
+  "/api/events",
+  createProxyMiddleware({
+    target: `${process.env.EVENT_SERVICE}/api/events`,
+    changeOrigin: true,
+    //pathRewrite: { "^/users/login": "/auth/login" },
+    on: {
+      proxyReq: fixRequestBody, 
+    },
+  })
+);
+
 
 app.listen(process.env.PORT, () => console.log(`API Gateway running on port ${process.env.PORT}`));
