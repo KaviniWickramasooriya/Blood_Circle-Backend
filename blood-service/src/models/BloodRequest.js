@@ -5,11 +5,11 @@ module.exports = (sequelize) => {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true
-    }, blood_id: {   // 👈 foreign key column
+    }, blood_id: {   //  foreign key column
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'blood', // must match tableName in Blood model
+        model: 'blood', 
         key: 'id'
       },
       onUpdate: 'CASCADE',
