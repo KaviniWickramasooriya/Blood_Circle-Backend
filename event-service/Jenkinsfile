@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        IMAGE_NAME = 'it22296696/user_service_blood_circle' // Updated to lowercase
+        IMAGE_NAME = 'it22296696/event_service_blood_circle' // Updated to lowercase
         BUILD_NUMBER = "${env.BUILD_NUMBER}"
     }
     stages {
@@ -38,7 +38,7 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                dir('user-service') { // Change to api-gateway directory
+                dir('event-service') { // Change to api-gateway directory
                     bat "docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} ."
                 }
             }
