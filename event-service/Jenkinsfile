@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        IMAGE_NAME = 'it22296696/user_service_blood_circle' // Updated to lowercase
+        IMAGE_NAME = 'it22296696/event_service_blood_circle' // Updated to lowercase
         BUILD_NUMBER = "${env.BUILD_NUMBER}"
     }
     stages {
@@ -38,7 +38,7 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                dir('user-service') { // Change to api-gateway directory
+                dir('event-service') { // Change to api-gateway directory
                     bat "docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} ."
                 }
             }
@@ -63,7 +63,7 @@ pipeline {
                     bat "docker pull ${IMAGE_NAME}:${BUILD_NUMBER}"
                     bat "docker stop nodeapp-cuban || exit 0"
                     bat "docker rm nodeapp-cuban || exit 0"
-                    bat "docker run -d --name nodeapp-cuban -p 3001:3001 ${IMAGE_NAME}:${BUILD_NUMBER}"
+                    bat "docker run -d --name nodeapp-cuban -p 3003:3003 ${IMAGE_NAME}:${BUILD_NUMBER}"
                 }
             }
         }
